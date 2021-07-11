@@ -1,0 +1,14 @@
+provider "aws" {
+  region                  = "ap-south-1"
+  shared_credentials_file = "~/.aws/credentials"
+  allowed_account_ids     = [612053565767]
+}
+
+resource "aws_instance" "myec2" {
+    ami = "ami-011c99152163a87ae"
+    instance_type = "t2.micro"
+
+    provisioner "local-exec" {
+      command = "echo ${aws_instance.myec2.private_ip} >> privateip.txt"
+    }
+}
