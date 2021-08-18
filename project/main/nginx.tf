@@ -25,11 +25,16 @@ resource "aws_lb_listener" "nginx-listener" {
   }
 }
 
+data "template_file" "user_data" {
+  template = file("../scripts/add-ssh-web-app.yaml")
+}
+
 resource "aws_launch_template" "nginx-launch-template" {
   name        = "nginx-template"
   description = "nginx launch template"
   image_id      = "ami-04db49c0fb2215364"
   instance_type = "t2.micro"
+  user_data  = base64encode(data.template_file.user_data.rendered)
 }
 
 
