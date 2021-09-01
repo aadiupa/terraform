@@ -5,7 +5,7 @@ resource "aws_lb" "public_nginx" {
   tags = {
     Environment = "production"
   }
-  subnets = tolist(["subnet-81bcdffa", "subnet-098d6662", "subnet-05fea749"])
+  subnets = var.subnets
 }
 
 resource "aws_lb_target_group" "target_group_nginx" {
@@ -25,16 +25,11 @@ resource "aws_lb_listener" "nginx-listener" {
   }
 }
 
-data "template_file" "user_data" {
-  template = file("../scripts/add-ssh-web-app.yaml")
-}
-
 resource "aws_launch_template" "nginx-launch-template" {
   name        = "nginx-template"
   description = "nginx launch template"
   image_id      = "ami-04db49c0fb2215364"
   instance_type = "t2.micro"
-  user_data  = base64encode(data.template_file.user_data.rendered)
 }
 
 
