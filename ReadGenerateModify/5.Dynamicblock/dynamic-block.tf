@@ -4,12 +4,6 @@ provider "aws" {
   allowed_account_ids     = [612053565767]
 }
 
-variable "sg_ports" {
-  type        = list(number)
-  description = "list of ingress"
-  default     = [8200, 8300, 8400, 8500]
-}
-
 resource "aws_security_group" "dynamic" {
   name        = "dynamic sg"
   description = "ingress"
