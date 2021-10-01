@@ -14,6 +14,10 @@ data "aws_ami" "ubuntu" {
   owners = ["099720109477"] # Canonical
 }
 
+output "test" {
+  value = data.aws_ami.ubuntu
+}
+
 resource "aws_lb" "public_nginx" {
   name               = "nginx-alb"
   internal           = false
@@ -29,7 +33,7 @@ resource "aws_lb_target_group" "target_group_nginx" {
   name     = "target-group-nginx"
   port     = "80"
   protocol = "HTTP"
-  vpc_id   = "aws_vpc.vpc.id"
+  vpc_id = aws_vpc.vpc.id
 }
 
 resource "aws_lb_listener" "nginx-listener" {
@@ -45,7 +49,7 @@ resource "aws_lb_listener" "nginx-listener" {
 resource "aws_launch_template" "nginx-launch-template" {
   name          = "nginx-template"
   description   = "nginx launch template"
-  image_id      = "data.aws_ami.ubuntu.id"
+  image_id      = data.aws_ami.ubuntu.id
   instance_type = var.instancetype
   user_data     = filebase64("example.sh")
 }
@@ -58,7 +62,11 @@ resource "aws_autoscaling_group" "nginx-autoscaling" {
   launch_template {
     id = aws_launch_template.nginx-launch-template.id
   }
-  availability_zones = ["ap-south-1a", "ap-south-1b"]
+  health_check_type = "EC2"
+  #for_each = data.aws_subnet_ids.public.ids
+  vpc_zone_identifier = flatten(aws_subnet.subnet_public.*.id)
+  #availability_zones = ""
+  #availability_zones = ["ap-south-1a", "ap-south-1b"]
 
 }
 

@@ -10,11 +10,17 @@ resource "aws_internet_gateway" "igw" {
 
 resource "aws_subnet" "subnet_public" {
   vpc_id     = aws_vpc.vpc.id
-  cidr_block = var.cidr_subnet
+  cidr_block = var.cidr_subnet[count.index]
+  count = 2
 }
 
+data "aws_subnet_ids" "public" {
+  vpc_id = aws_vpc.vpc.id
+}
+
+
 output "id_subnet"{
-  value = aws_subnet.subnet_public.id
+  value = aws_subnet.subnet_public.*.id
 }
 
 resource "aws_route_table" "rtb_public" {
@@ -27,7 +33,8 @@ resource "aws_route_table" "rtb_public" {
 }
 
 resource "aws_route_table_association" "rta_subnet_public" {
-  subnet_id      = aws_subnet.subnet_public.id
+  count = "${length(aws_subnet.subnet_public)}"
+  subnet_id = element(aws_subnet.subnet_public.*.id, count.index)
   route_table_id = aws_route_table.rtb_public.id
 }
 
@@ -49,7 +56,6 @@ resource "aws_security_group" "sg_22_80" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
-
 
   ingress {
     from_port   = 8080
