@@ -11,13 +11,14 @@ resource "aws_internet_gateway" "igw" {
 resource "aws_subnet" "subnet_public" {
   vpc_id     = aws_vpc.vpc.id
   cidr_block = var.cidr_subnet[count.index]
+  availability_zone = var.availability_z[count.index]
   count = 2
 }
 
 data "aws_subnet_ids" "public" {
+  depends_on = [aws_subnet.subnet_public]
   vpc_id = aws_vpc.vpc.id
 }
-
 
 output "id_subnet"{
   value = aws_subnet.subnet_public.*.id
