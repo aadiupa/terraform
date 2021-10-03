@@ -1,7 +1,7 @@
-resource "aws_key_pair" "private" {
-    key_name = "private_key"
-    public_key = file("/home/user/.ssh/terraform.pub")
-}
+#resource "aws_key_pair" "private" {
+#    key_name = "private_key"
+#    public_key = file("/home/user/.ssh/terraform.pub")
+#}
 
 data "aws_ami" "ubuntu" {
   most_recent = true
@@ -51,20 +51,26 @@ resource "aws_lb_listener" "nginx-listener" {
   }
 }
 
+data "template_file" "user_data" {
+  template = file("../scripts/install-nginx.yaml")
+}
+
 resource "aws_launch_template" "nginx-launch-template" {
   name          = "nginx-template"
   description   = "nginx launch template"
   image_id      = data.aws_ami.ubuntu.id
   instance_type = var.instancetype
-  key_name    = "private_key"
-  user_data     = filebase64("example.sh")
+  #key_name    = "private_key"
+  #user_data     = filebase64("example.sh")
   network_interfaces {
     associate_public_ip_address = true
     security_groups = aws_security_group.sg_22_80.*.id
   }
+  user_data = base64encode(data.template_file.user_data.rendered)
 
   #vpc_security_group_ids = aws_security_group.sg_22_80.*.id
 }
+
 
 resource "aws_autoscaling_group" "nginx-autoscaling" {
   name_prefix      = "nginx"
