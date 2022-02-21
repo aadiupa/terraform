@@ -4,7 +4,7 @@ provider "aws" {
 
 
 resource "aws_dynamodb_table" "basic-dynamodb-table" {
-    name           = data.aws_ssm_parameter.name.value
+    name           = "EPS2"
     billing_mode   = "PROVISIONED"
     read_capacity  = 1
     write_capacity = 1
@@ -19,9 +19,4 @@ resource "aws_dynamodb_table" "basic-dynamodb-table" {
     enabled        = true
   }
  # tags = var.default_tags
-}
-
-
-data "aws_ssm_parameter" "name" {
-    name="/alignx/dynamodb/tablename"
 }

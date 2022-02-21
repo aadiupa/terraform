@@ -25,4 +25,5 @@ jobs:
       - name: Terraform plan
         run: |
           cd ./baproject
+          terraform init
           terraform plan
