@@ -1,6 +1,3 @@
-provider "aws" {
-  region = "us-east-2"
-}
 
 
 resource "aws_dynamodb_table" "basic-dynamodb-table" {
