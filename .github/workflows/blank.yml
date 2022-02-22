@@ -43,7 +43,7 @@ jobs:
       - name: Terraform Init
         id: init
         run: |
-          cd terraform-code
+          cd ./ba/account/infra
           terraform init -backend-config="bucket=${{ secrets.STATE_BUCKET_NAME }}" \
              -backend-config="key=${GITHUB_WORKFLOW}" \
              -backend-config="region=${{ secrets.AWS_REGION }}" \
