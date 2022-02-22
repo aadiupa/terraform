@@ -45,15 +45,16 @@ jobs:
         run: |
           cd terraform-code
           terraform init -backend-config="bucket=${{ secrets.STATE_BUCKET_NAME }}" \
-             -backend-config="key=${{ secrets.STATE_KEY }}" \
+             -backend-config="key=${GITHUB_WORKFLOW}" \
              -backend-config="region=${{ secrets.AWS_REGION }}" \
              -backend-config="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
              -backend-config="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
              -input=false -no-color
+    
 
       - name: Terraform plan
         run: |
-          
+          cd ./ba/account/infra
           terraform plan
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
