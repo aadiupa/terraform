@@ -23,6 +23,7 @@ on:
               options:
                 - account
                 - alignx
+                - authorization
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -48,9 +49,9 @@ jobs:
       - name: Terraform Init
         id: init
         run: |
-          cd ./services/${GITHUB_WORKFLOW}/infra
+          cd ./ba/${{ github.event.inputs.jobs }}/infra
           terraform init -backend-config="bucket=${{ secrets.STATE_BUCKET_NAME }}" \
-             -backend-config="key=s3backend/${GITHUB_WORKFLOW}" \
+             -backend-config="key=s3backend/${{ github.event.inputs.stage }}/terraform.tfstate" \
              -backend-config="region=${{ secrets.AWS_REGION }}" \
              -backend-config="dynamodb_table=${{ secrets.DYNAMODB_TABLE }}" \
              -input=false -no-color
@@ -63,7 +64,7 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: |
-          cd ./services/${GITHUB_WORKFLOW}/infra
+          cd ./ba/${{ github.event.inputs.jobs }}/infra
           terraform plan -var="environment=${{ github.event.inputs.stage }}" -no-color -out=planfile
         continue-on-error: true
 
