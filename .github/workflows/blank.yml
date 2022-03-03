@@ -76,4 +76,4 @@ jobs:
         id: apply
         run: |
           cd ./ba/${{ github.event.inputs.jobs }}/infra
-          terraform apply "planfile" -auto-approve
+          terraform apply "planfile"
