@@ -4,8 +4,6 @@ name: baproject
 
 # Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
           inputs:
@@ -26,7 +24,6 @@ on:
                 - account
                 - alignx
 
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -40,23 +37,38 @@ jobs:
       - uses: actions/checkout@v2
 
       # Runs a single command using the runners shell
+      - name: Terraform Format
+        id: fmt
+        run: terraform fmt -check
+
       - name: Terraform Init
         id: init
         run: |
-          cd ./ba/account/infra
+          cd ./services/${GITHUB_WORKFLOW}/infra
           terraform init -backend-config="bucket=${{ secrets.STATE_BUCKET_NAME }}" \
-             -backend-config="key=${GITHUB_WORKFLOW}" \
+             -backend-config="key=s3backend/${GITHUB_WORKFLOW}" \
              -backend-config="region=${{ secrets.AWS_REGION }}" \
-             -backend-config="access_key=${{ secrets.AWS_ACCESS_KEY_ID }}" \
-             -backend-config="secret_key=${{ secrets.AWS_SECRET_ACCESS_KEY }}" \
-             -backend-config="dynamodb_table=terraform_lock" \
+             -backend-config="dynamodb_table=${{ secrets.DYNAMODB_TABLE }}" \
              -input=false -no-color
-    
 
-      - name: Terraform plan
+      # Validate the terraform configuration.
+      - name: Terraform Validate
+        id: validate
+        run: terraform validate -no-color
+
+      - name: Terraform Plan
+        id: plan
         run: |
-          cd ./ba/account/infra
-          terraform destroy -auto-approve
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          cd ./services/${GITHUB_WORKFLOW}/infra
+          terraform plan -var="environment=${{ github.event.inputs.stage }}" -no-color -out=planfile
+        continue-on-error: true
+
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+
+      - name: Terraform Apply
+        id: apply
+        run: |
+          cd ./services/${GITHUB_WORKFLOW}/infra 
+          terraform apply "planfile" -auto-approve

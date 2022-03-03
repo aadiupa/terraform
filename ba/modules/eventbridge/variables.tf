@@ -1,0 +1,3 @@
+variable "eventbridgename" {
+  default = null
+}
