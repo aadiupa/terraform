@@ -75,5 +75,5 @@ jobs:
       - name: Terraform Apply
         id: apply
         run: |
-          cd ./services/${GITHUB_WORKFLOW}/infra 
+          cd ./ba/${{ github.event.inputs.jobs }}/infra
           terraform apply "planfile" -auto-approve
