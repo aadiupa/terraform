@@ -72,13 +72,8 @@ jobs:
             2) echo "Changes found";
               echo "Contact DevOps Team"
             esac
-
-
-
-
-
-
+            
       - name: Terraform Apply
         id: apply
         run: |
-          echo "haan bhai apply kar diye hai"
+          terraform apply -auto-approve
