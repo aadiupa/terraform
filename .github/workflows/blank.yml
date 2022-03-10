@@ -43,14 +43,14 @@ jobs:
       - uses: actions/checkout@v2
 
 
-      - name: Install Serverless Framework and configure AWS authentication
-        if: ${{ github.event.inputs.stage != 'dev'}}
+      - name: Projects where no changes have been made, add the current commit id.
         run: |
-          npm install -g serverless@2.9.0
-          sls config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-      
-      - name: Serverless Version
-        run: serverless --version
+         while read -r line; do
+         echo "$line"
+         repo_name="serverless-{$line}-v2-dev"
+         echo "$repo_name"
+         done < ./unchangedprojects.log
+
       
       # - name: Terraform Format
       #   id: fmt
