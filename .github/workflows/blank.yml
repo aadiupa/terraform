@@ -64,11 +64,20 @@ jobs:
       - name: Terraform Plan
         id: plan
         run: |
-          cd ./ba/${{ github.event.inputs.jobs }}/infra
-          terraform plan -var="environment=${{ github.event.inputs.stage }}" -no-color -out=planfile
+          terraform plan --var="environment=$1" --detailed-exitcode -out=tf.plan 2> /dev/null || ec=$?
+          case $ec in 
+            0) echo "No Changes Found": exit 0;;
+            1) printf '%s/n' "Command exited with non-zero";exit 1;;
+            2) echo "Changes found";
+              echo "Contact DevOps Team"
+            esac
+
+
+
+
+
 
       - name: Terraform Apply
         id: apply
         run: |
-          cd ./ba/${{ github.event.inputs.jobs }}/infra
-          terraform apply "planfile"
+          echo "haan bhai apply kar diye hai"
