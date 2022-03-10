@@ -74,8 +74,7 @@ jobs:
             0) echo "No Changes Found": exit 0;;
             1) printf '%s/n' "Command exited with non-zero";exit 1;;
             2) echo "Changes found";
-              echo "Contact DevOps Team"
-              exit 1
+              echo "Contact DevOps Team"             
             esac
 
       - name: Terraform Apply
