@@ -1,10 +1,10 @@
 provider "aws" {
   region = "us-east-2"
-  
+
 }
 
 terraform {
-    backend "s3" {}
+  backend "s3" {}
 }
 
 resource "aws_instance" "firstecd2" {
