@@ -81,4 +81,4 @@ jobs:
         id: apply
         run: |
           cd ./terrafortesting
-          terraform apply -auto-approve
+          terraform apply -var="environment=dev" -auto-approve
