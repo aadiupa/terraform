@@ -82,4 +82,4 @@ jobs:
         id: apply
         run: |
           cd ./terrafortesting
-          terraform apply -var="environment=dev" -auto-approve
+          echo "jai jai bajrangbali"
