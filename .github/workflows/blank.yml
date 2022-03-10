@@ -46,7 +46,7 @@ jobs:
       - name: Lets see if this comes in
         run: |
           pwd
-          cd ./ba/integrations/slack/infra
+          cd ./ba/${{ github.event.inputs.jobs }}/infra
           echo "Success"
           pwd
          # Runs a single command using the runners shell
