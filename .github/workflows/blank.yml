@@ -47,6 +47,7 @@ jobs:
         run:
           cd ./ba/${{ github.event.inputs.jobs }}/infra
           echo "Success"
+          pwd
          # Runs a single command using the runners shell
       
       
