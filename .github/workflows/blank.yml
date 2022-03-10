@@ -49,7 +49,8 @@ jobs:
           npm install -g serverless@2.9.0
           sls config credentials --provider aws --key ${{ secrets.AWS_ACCESS_KEY_ID }} --secret ${{ secrets.AWS_SECRET_ACCESS_KEY }}
       
-      
+      - name: Serverless Version
+        run: serverless --version
       
       # - name: Terraform Format
       #   id: fmt
