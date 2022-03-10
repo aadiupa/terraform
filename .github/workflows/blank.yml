@@ -43,7 +43,7 @@ jobs:
 
 
       - name: Lets see if this comes in
-        if: ${{ github.event.inputs.stage == 'dev' && github.event.inputs.jobs != 'account' }}
+        if: ${{ github.event.inputs.stage == 'dev' && github.event.inputs.jobs == 'alignx' }}
         run: echo "Success"
       # Runs a single command using the runners shell
       # - name: Terraform Format
