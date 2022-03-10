@@ -75,7 +75,7 @@ jobs:
             1) printf '%s/n' "Command exited with non-zero";exit 1;;
             2) echo "Changes found";
               echo "Changes are required please contact DevOps Team"
-                       
+              exit 1         
             esac
 
       - name: Terraform Apply
