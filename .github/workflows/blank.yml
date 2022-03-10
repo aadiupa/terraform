@@ -46,7 +46,7 @@ jobs:
       - name: Projects where no changes have been made, add the current commit id.
         run: |
          while read -r line; do
-         echo "$line"
+         echo "${line}"
          repo_name="serverless-"${line}"-v2-dev"
          echo "$repo_name"
          done < ./unchangedprojects.log
