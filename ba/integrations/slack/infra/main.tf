@@ -7,8 +7,14 @@ terraform {
       source  = "hashicorp/aws"
     }
   }
- # backend "s3" {}
+ 
 }
 provider "aws" {
-  region = var.aws_region
+  region = "us-east-2"
+}
+
+
+resource "null_resource" "cluster" {
+  # Won't do anything
+
 }
