@@ -1,0 +1,44 @@
+name: 'account'
+on:
+  workflow_dispatch:
+    inputs:
+      stage:
+        description: 'stage [local,dev,prod]'
+        required: true
+        default: 'local'
+        type: choice
+        options:
+          - local
+          - dev
+          - prod
+      release:
+        description: 'Enter the release version/imagetag, not required for dev and local'
+        default: 'latest'
+        required: false
+jobs:
+  deploy:
+    environment: ${{ github.event.inputs.stage }}
+    name: deploy-account
+    runs-on: ubuntu-latest
+    env:
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+      AWS_REGION: ${{ secrets.AWS_REGION }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Login to ECR
+        if: ${{ github.event.inputs.stage != 'dev'}}
+        run: docker login -u AWS -p $(aws ecr get-login-password --region ${{ secrets.AWS_REGION }} ) ${{ secrets.AWS_ECR_PATH }}
+
+      - name: Tag prod images
+        if: ${{ github.event.inputs.stage == 'prod'}}
+        run: |
+          repo_name="serverless-${GITHUB_WORKFLOW}-v2-dev"
+          MANIFEST=$(aws ecr batch-get-image --repository-name $repo_name --image-ids imageTag=${{ github.event.inputs.release }} --output json | jq --raw-output '.images[0].imageManifest')
+          aws ecr put-image --repository-name $repo_name --image-tag "prod-image" --image-manifest "$MANIFEST"
+      - name: Retag the container with commitId
+        if: ${{ github.event.inputs.stage == 'dev' }}
+        run: |
+          repo_name="serverless-${GITHUB_WORKFLOW}-v2-dev"
+          MANIFEST=$(aws ecr batch-get-image --repository-name $repo_name --image-ids imageTag=latest --output json | jq --raw-output '.images[0].imageManifest')
+          aws ecr put-image --repository-name $repo_name --image-tag "$(git rev-parse HEAD)" --image-manifest "$MANIFEST"
