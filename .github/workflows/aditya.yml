@@ -26,20 +26,19 @@ jobs:
       AWS_REGION: ${{ secrets.AWS_REGION }}
     steps:
       - uses: actions/checkout@v2
-      - name: Login to ECR
-        if: ${{ github.event.inputs.stage != 'dev'}}
-        run: docker login -u AWS -p $(aws ecr get-login-password --region ${{ secrets.AWS_REGION }} ) ${{ secrets.AWS_ECR_PATH }}
-
-      - name: Tag prod images
-        if: ${{ github.event.inputs.stage == 'prod'}}
-        run: |
-          docker login -u AWS -p $(aws ecr get-login-password --region ${{ secrets.AWS_REGION }} ) ${{ secrets.AWS_ECR_PATH }}
-          repo_name="serverless-aws-nodejs-docker-demo2-dev"
-          MANIFEST=$(aws ecr batch-get-image --repository-name $repo_name --image-ids imageTag=${{ github.event.inputs.release }} --output json | jq --raw-output '.images[0].imageManifest')
-          aws ecr put-image --repository-name $repo_name --image-tag "prod-image" --image-manifest "$MANIFEST"
       - name: Retag the container with commitId
         if: ${{ github.event.inputs.stage == 'dev' }}
         run: |
           repo_name="serverless-aws-nodejs-docker-demo2-dev"
           MANIFEST=$(aws ecr batch-get-image --repository-name $repo_name --image-ids imageTag=latest --output json | jq --raw-output '.images[0].imageManifest')
           aws ecr put-image --repository-name $repo_name --image-tag "$(git rev-parse HEAD)" --image-manifest "$MANIFEST"
+      - name: Tag prod images
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.DEV_ACCESS_KEY }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.DEV_SECRET_KEY }}
+          AWS_REGION: ${{ secrets.AWS_REGION }}
+        if: ${{ github.event.inputs.stage == 'prod'}}
+        run: |
+          repo_name="serverless-aws-nodejs-docker-demo2-dev"
+          MANIFEST=$(aws ecr batch-get-image --repository-name $repo_name --image-ids imageTag=${{ github.event.inputs.release }} --output json | jq --raw-output '.images[0].imageManifest')
+          aws ecr put-image --repository-name $repo_name --image-tag "prod-image" --image-manifest "$MANIFEST"
