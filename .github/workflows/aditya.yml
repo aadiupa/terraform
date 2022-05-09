@@ -33,12 +33,12 @@ jobs:
       - name: Tag prod images
         if: ${{ github.event.inputs.stage == 'prod'}}
         run: |
-          repo_name="serverless-${GITHUB_WORKFLOW}-v2-dev"
+          repo_name="serverless-aws-nodejs-docker-demo2-dev"
           MANIFEST=$(aws ecr batch-get-image --repository-name $repo_name --image-ids imageTag=${{ github.event.inputs.release }} --output json | jq --raw-output '.images[0].imageManifest')
           aws ecr put-image --repository-name $repo_name --image-tag "prod-image" --image-manifest "$MANIFEST"
       - name: Retag the container with commitId
         if: ${{ github.event.inputs.stage == 'dev' }}
         run: |
-          repo_name="serverless-${GITHUB_WORKFLOW}-v2-dev"
+          repo_name="serverless-aws-nodejs-docker-demo2-dev"
           MANIFEST=$(aws ecr batch-get-image --repository-name $repo_name --image-ids imageTag=latest --output json | jq --raw-output '.images[0].imageManifest')
           aws ecr put-image --repository-name $repo_name --image-tag "$(git rev-parse HEAD)" --image-manifest "$MANIFEST"
