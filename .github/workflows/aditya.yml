@@ -33,6 +33,7 @@ jobs:
       - name: Tag prod images
         if: ${{ github.event.inputs.stage == 'prod'}}
         run: |
+          docker login -u AWS -p $(aws ecr get-login-password --region ${{ secrets.AWS_REGION }} ) ${{ secrets.AWS_ECR_PATH }}
           repo_name="serverless-aws-nodejs-docker-demo2-dev"
           MANIFEST=$(aws ecr batch-get-image --repository-name $repo_name --image-ids imageTag=${{ github.event.inputs.release }} --output json | jq --raw-output '.images[0].imageManifest')
           aws ecr put-image --repository-name $repo_name --image-tag "prod-image" --image-manifest "$MANIFEST"
